@@ -1,7 +1,12 @@
 FROM python:3.10-alpine AS builder
 WORKDIR /app
 COPY requirements.txt .
-RUN apt -y install python3.10-tk
+RUN apk add --update --no-cache \
+    tcl-dev \
+    tk-dev \
+    libffi-dev \
+    openssl-dev \
+    tk
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
