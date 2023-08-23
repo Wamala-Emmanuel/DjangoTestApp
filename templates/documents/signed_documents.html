@@ -1,0 +1,184 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="content-wrapper pb-0">
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      {% if messages %}
+      <ul class="messages bg-success">
+        {% for message in messages %}
+        <div class="{{ message.tags }}">
+          <div class="alert alert-succes p-2">
+            <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
+              <i class="mdi mdi-close-box-outline"></i>
+            </button>
+            <span class="text-white"><b>{{ message|safe }}</b></span>
+          </div>
+        </div>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- <div class="page-header flex-wrap">
+    <div class="header-left">
+      <p>Recently Uploaded Templates for Download</p>
+    </div>
+    <div class="pull-right">
+      <a href="{% url 'document_categories' %}" class="btn btn-primary mb-2 mb-md-0 mr-2">
+        View More 
+      </a>
+    </div>
+  </div> -->
+
+  <!-- <div class="row justify-content-center">
+    {% if request.user.profile.role.name == 'Personal Banker' %}
+    <div class="col-sm-2">
+      <a href="{% url 'add_document_category' %}" class="stretched-link"></a>
+      <div class="card text-center d-flex justify-content-center align-items-center" style="height: 180px;">
+        <i class="mdi mdi-note-plus text-primary" style="font-size:60px;"></i>
+      </div>
+      <small class="font-weight-bold pt-1">Upload Forms</small>
+    </div>
+    {% endif %}
+    {% if request.user.profile.role.name == 'Company Originator' %}
+      {% for category in categories %}
+      <div class="col-sm-2 text-center">
+        <a href="{{ category.file.url }}" class="stretched-link"></a>
+        <div class=" card text-center d-flex justify-content-center align-items-center mb-1 pb-1" style="height: 180px; overflow-y: hidden;">
+          <object data="{{ category.file.url }}" type="text/html" width="100%" height="100%" style="overflow:hidden; width: 100%; height: 100%"></object>
+        </div>
+        <small class="font-weight-bold pt-1 mt-1">{{ category.name }}</small>
+      </div>
+      <div class="col-sm-2">
+        <a href="{{ category.file.url }}" class="stretched-link"></a>
+        <div class="card text-center d-flex justify-content-center align-items-center" style="height: 180px;">
+          <a href="{{ category.file.url }}" download class="btn btn-sm pull-right">
+            <i class="mdi mdi-download" style="font-size:13px;"></i>
+          </a>
+          <img src="{% static 'assets/images/pdf.png' %}" alt="logo" style="width: 70%; height: 70%; border-radius: 0%;" class="mr-1">
+
+          <i class="mdi mdi-file-pdf text-primary" style="font-size:100px;"></i>
+        </div>
+        <small class="font-weight-bold pt-1">{{ category.name }}</small>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div> -->
+  
+  {% if request.user.profile.role.name == 'Company Originator' %}
+  <div class="page-header flex-wrap mt-4">
+    <div class="header-left">
+      <small>Upload Document</small>
+    </div>
+    <div class="pull-right">
+      <!-- <select class="selectpicker btn btn-sm btn-secondary">
+        <option selected disabled>Filter</option>
+        {% for category in categories %}
+        <option>{{ category.name }}</option>
+        {% endfor %}
+      </select> -->
+      <a href="{% url 'upload_document' %}" class="btn btn-primary mb-2 mb-md-0 mr-2">
+        Upload Form 
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="card mt-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <small class="card-title">Signed Documents</small>
+        </div>
+        <div class="col-md-8">
+          <form method="GET" action="">
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" name="q" placeholder="Search Form" />
+                <div class="input-group-append">
+                  <input class="btn btn-sm btn-primary" type="submit" value="Search Form" />
+                </div>
+              </div>
+            </div>
+          </form>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Form Category</th>
+            <th>Company</th>
+            <th>Added By</th>
+            <th>Stage</th>
+            <th>Status</th>
+            <th>Date Added</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for document in documents %}
+          <tr>
+            <td>
+              <img src="{% static 'assets/images/pdf.png' %}" alt="logo" style="width: 15%; height: 15%; border-radius: 0%;" class="mr-1">
+              {{ document.category.name }}
+            </td>
+            <td>{{ document.added_by.profile.company.name }}</td>
+            <td>{{ document.added_by.first_name }} {{ document.added_by.last_name }}</td>
+            <td>{{ document.stage }}</td>
+            <td>
+              {% if document.status == 'Approved' %}
+                <label class="badge badge-success">Approved</label>
+              {% else %}
+                <label class="badge badge-primary">Pending</label>
+              {% endif %}
+            </td>
+            <td>{{ document.created }}</td>
+            <td>
+              <a href="{% url 'document' document.id %}" class="btn btn-sm btn-success">View</a>
+              <a type="button" class="btn btn-sm btn-warning mb-2 mb-md-0 mr-2" data-toggle="modal" data-target="#completeDocumentModal"> 
+                Complete
+                </a>
+                <div class="modal fade" id="completeDocumentModal" tabindex="-1" role="dialog" aria-labelledby="completeDocumentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="">Complete Document</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body ">
+                                <p class="text-wrap">Are you sure you want to complete this document?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <a href="{% url 'complete_document' document.id %}" class="btn btn-warning">Complete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if documents.has_other_pages %}
+      <div class="btn-group pull-right" role="group" aria-label="Item pagination">
+        {% if documents.has_previous %}
+        <a href="?page={{ documents.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a> {% endif %} {% for page_number in documents.paginator.page_range %} {% if documents.number == page_number %}
+        <button class="btn btn-outline-primary active">
+            <span>{{ page_number }} <span class="sr-only">(current)</span></span>
+        </button> {% else %}
+        <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+            {{ page_number }}
+        </a> {% endif %} {% endfor %} {% if documents.has_next %}
+        <a href="?page={{ documents.next_page_number }}" class="btn btn-outline-primary">&raquo;</a> {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>  
+</div>
+
+{% endblock %}

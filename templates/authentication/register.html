@@ -1,0 +1,37 @@
+{% extends "login_base.html" %} {% load static %} {% load crispy_forms_tags %} {% block content %}
+<div class="container-fluid page-body-wrapper full-page-wrapper">
+    <div class="content-wrapper d-flex align-items-center auth px-0" style="background-color: #0033A1;">
+        <div class="row w-100 mx-0">
+            <div class="col-lg-4 mx-auto">
+                <div class="auth-form-light text-left py-5 px-4 px-sm-5" style="background: #FFFFFF;">
+                    <div class="brand-logo text-center mb-1">
+                        <img src="{% static 'assets/images/logo.png' %}" alt="logo" style="width: 80%; height: 80%;">
+                    </div>
+                    <h4 class="text-center m-2">Agent Banking Terminal Linking</h4>
+                    <hr/>
+                    <h6 class="mt-2 mb-4">Register</h6>
+                    {% if messages %}
+                    <div class="alert alert-danger alert-dismissible mt-3" role="alert">
+                        {% for message in messages %}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span> 
+                            </button>
+                        <div class="alert-message">
+                            {{ message|safe }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %} {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">Create Account</button>
+                    </form>
+                    <div class="text-center mt-4 font-weight-light">
+                        Already have an account? <a href="{% url 'register' %}" class="text-primary">Create Account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

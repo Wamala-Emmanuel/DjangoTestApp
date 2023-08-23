@@ -1,0 +1,102 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+
+<div class="content-wrapper pb-0">    
+    <div class="row">
+      <div class="col-xl-12 stretch-card grid-margin">
+        <div class="card">
+            <div class="card-body">
+              <div class="card-title mb-2">Audit Logs</div>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Added By</th>
+                            <th>Date Created</th>
+                            <th>http_method</th>
+                            <th>activity_type</th>
+                            <!-- <th>url</th> -->
+                            <th>description</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for audit_log in audit_logs %}
+                        <tr>
+                            <td style="font-family:courier new">{{ audit_log.added_by.first_name }} {{ audit_log.added_by.last_name }}</td>
+                            <th style="font-family:courier new">{{ audit_log.created }}</th>
+                            <td style="font-family:courier new">{{ audit_log.http_method }}</td>
+                            <th style="font-family:courier new">{{ audit_log.activity_type }}</th>
+                            <th style="font-family:courier new">
+                                <strong>{{ audit_log.description|truncatechars:40 }}
+                                </strong>
+                            </th>
+                            <th>
+                                <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#activateModal{{ audit_log.id }}">
+                                    View More
+                                </button>
+                                <div class="modal fade" id="activateModal{{ audit_log.id }}" tabindex="-1" role="dialog" aria-labelledby="activateModal" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="activateModalLabel">Audit Log Details</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body text-wrap">
+                                                <label style="font-family:courier new">
+                                                        <strong>Date: </strong>{{ audit_log.created }} 
+                                                    </label><br/>
+                                                <label style="font-family:courier new">
+                                                        <strong>Added By: </strong>{{ audit_log.added_by.first_name }} {{ audit_log.added_by.last_name }}
+                                                    </label><br/>
+                                                <label style="font-family:courier new">
+                                                        <strong>Acitivity Type:</strong> {{ audit_log.activity_type }}
+                                                    </label><br/>
+                                                <label style="font-family:courier new">
+                                                        <strong>HTTP Method: </strong> {{ audit_log.http_method }}
+                                                    </label>
+                                                <hr/>
+                                                <h6>Request Body</h6>
+                                                <label style="font-family:courier new">
+                                                        {{ audit_log.request_body }}
+                                                    </label>
+                                                <h6>Description</h6>
+                                                <label style="font-family:courier new">
+                                                    {{ audit_log.description }}
+                                                    </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <ul class="pagination pull-right float-right mt-2">
+                    {% if audit_logs.has_other_pages %} {% if audit_logs.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">first</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ audit_logs.previous_page_number }}">{{ audit_logs.previous_page_number }}</a></li> {% endif %}
+                    <li class="page-item active">
+                        <a class="page-link" href="#">
+                            <span class="current">
+                    {{ audit_logs.number }} 
+                </span></a>
+                    </li>{% if audit_logs.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ audit_logs.next_page_number }}">{{ audit_logs.next_page_number }}</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ audit_logs.paginator.num_pages }}">last </a> {% endif %} {% endif %}</li>
+                </ul>
+            </div>
+            </div>
+          </div>
+      </div>
+    </div>  
+  </div>
+
+{% endblock %}

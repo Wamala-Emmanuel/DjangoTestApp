@@ -1,0 +1,159 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="content-wrapper pb-0">
+  <div class="page-header flex-wrap">
+    <div class="pull-right">
+      <a href="{% url 'edit' user.id %}" class="btn btn-success mb-2 mb-md-0 mr-2"> Edit</a>
+      {% if user.is_active %}
+        <button class="btn btn-danger mb-2 mb-md-0 mr-2"> Deactivate </button>
+      {% else %}
+        <button class="btn btn-primary mb-2 mb-md-0 mr-2"> Activate </button>
+      {% endif %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xl-3 stretch-card grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title mb-2">Profile Details 
+            {% if user.profile.active %}
+              <i class="mdi mdi-check-circle text-success"></i>
+            {% else %}
+              <i class="mdi mdi-close-circle text-danger"></i>
+            {% endif %}
+          </div>
+          <div class="border-bottom py-3 text-center">
+            <div class="nav-profile-img">
+              <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" />
+            </div><br/>
+            <span class="font-15 text-muted font-weight-bold">{{ user.username }}</span><br/>
+            <span class="font-13 text-muted font-weight-bold">{{ user.first_name }} {{ user.last_name }}</span><br/>
+            <span class="font-12 text-muted">{{ user.profile.role.name }}</span><br/>
+            <span class="font-12 text-muted">{{ user.profile.created }}</span><br/>
+          </div>
+          <div class="d-flex border-bottom py-3">
+            <div class="pl-2">
+              <span class="font-12 text-muted">Email: {{user.profile.email }}</span><br/>
+              <span class="font-12 text-muted">Address: {{user.profile.address }}</span><br/>
+              <span class="font-12 text-muted">Phone: {{user.profile.phone }}</span>
+            </div>
+          </div>
+          <div class="d-flex border-bottom py-3">
+            <div class="pl-2">
+              <span class="font-12 text-muted">Company</span>
+              <p class="m-0 text-black">{{ user.profile.company.name }}</p>
+            </div>
+          </div>
+          <div class="d-flex border-bottom py-3">
+            <div class="pl-2">
+              <span class="font-12 text-muted">Added By</span>
+              <p class="m-0 text-black">{{ user.profile.added_by.first_name }} {{ user.profile.added_by.last_name }}</p>
+              <p class="font-10 m-0 text-black">{{ user.profile.created }}</p>
+            </div>
+          </div>
+          <div class="d-flex border-bottom py-3">
+            <div class="pl-2">
+              <span class="font-12 text-muted">Approved By</span>
+              <p class="m-0 text-black">{{ user.profile.approved_by.first_name }} {{ user.profile.approved_by.first_name }}</p>
+              <p class="font-10 m-0 text-black">{{ user.profile.approved_date }}</p>
+            </div>
+          </div>
+          <div class="d-flex border-bottom py-3">
+            <div class="pl-2">
+              <span class="font-12 text-muted">Deactivated By</span>
+              <p class="m-0 text-black">{{ user.profile.deactivated_by.first_name }} {{ user.profile.deactivated_by.first_name }}</p>
+              <p class="font-10 m-0 text-black">{{ user.profile.deactivated_date }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-9 stretch-card grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between flex-wrap">
+            <div>
+              <div class="card-title mb-0">{{ company.name }}</div>
+              <h3 class="font-weight-bold mb-0">{{ company.phone }}</h3>
+            </div>
+          <div>
+          <div class="d-flex flex-wrap pt-2 justify-content-between sales-header-right">
+            <div class="d-flex mr-5">
+              <button type="button" class="btn btn-social-icon btn-outline-sales">
+                <i class="mdi mdi-clipboard-text menu-icon"></i>
+              </button>
+              <div class="pl-2">
+                <h4 class="mb-0 font-weight-semibold head-count"> 234 </h4>
+                <span class="font-10 font-weight-semibold text-muted">APPROVED DOCUMENTS</span>
+              </div>
+            </div>
+            <div class="d-flex mr-3 mt-2 mt-sm-0">
+              <button type="button" class="btn btn-social-icon btn-outline-sales profit">
+                <i class="mdi mdi-file-document menu-icon"></i>
+              </button>
+              <div class="pl-2">
+                <h4 class="mb-0 font-weight-semibold head-count"> 24 </h4>
+                <span class="font-10 font-weight-semibold text-muted">PENDING DOCUMENTS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="text-muted font-13 mt-2 mt-sm-0"> {{ company.email }}</p><hr/>
+      <div class="flot-chart-wrapper">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Form Category</th>
+                <th>Company</th>
+                <th>Added By</th>
+                <th>Stage</th>
+                <th>Status</th>
+                <th>Date Added</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for document in documents %}
+              <tr>
+                <td>
+                  <img src="{% static 'assets/images/pdf.png' %}" alt="logo" style="width: 15%; height: 15%; border-radius: 0%;" class="mr-1">
+                  {{ document.category.name }}
+                </td>
+                <td>{{ document.added_by.profile.company.name }}</td>
+                <td>{{ document.added_by.first_name }} {{ document.added_by.last_name }}</td>
+                <td>{{ document.stage }}</td>
+                <td>
+                  {% if document.status == 'Approved' %}
+                    <label class="badge badge-success">Approved</label>
+                  {% else %}
+                    <label class="badge badge-primary">Pending</label>
+                  {% endif %}
+                </td>
+                <td>{{ document.created }}</td>
+                <td>
+                  <a href="{% url 'document' document.id %}" class="btn btn-sm btn-success">View</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% if documents.has_other_pages %}
+          <div class="btn-group pull-right" role="group" aria-label="Item pagination">
+            {% if documents.has_previous %}
+            <a href="?page={{ documents.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a> {% endif %} {% for page_number in documents.paginator.page_range %} {% if documents.number == page_number %}
+            <button class="btn btn-outline-primary active">
+                <span>{{ page_number }} <span class="sr-only">(current)</span></span>
+            </button> {% else %}
+            <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+                {{ page_number }}
+            </a> {% endif %} {% endfor %} {% if documents.has_next %}
+            <a href="?page={{ documents.next_page_number }}" class="btn btn-outline-primary">&raquo;</a> {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

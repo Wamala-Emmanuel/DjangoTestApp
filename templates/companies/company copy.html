@@ -1,0 +1,60 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+
+<div class="content-wrapper pb-0">
+  
+  <div class="page-header flex-wrap">
+    <div class="header-left">
+      <a href="{% url 'update_company' company.id %}" class="btn btn-primary mb-2 mb-md-0 mr-2"> 
+        Update Company 
+      </a>
+      {% if company.is_approved %}
+        <a href="{% url 'upload_document' %}" class="btn btn-danger mb-2 mb-md-0">Deactivate</a>
+      {% else %}
+        <a href="{% url 'upload_document' %}" class="btn btn-danger mb-2 mb-md-0">Pending</a>
+      {% endif %}
+    </div>
+    <div class="header-right d-flex flex-wrap mt-md-2 mt-lg-0">
+      <a href="{% url 'add_user' %}" type="button" class="btn btn-primary mt-2 mt-sm-0 btn-icon-text">
+        <i class="mdi mdi-plus-circle"></i> Add User 
+      </a>
+    </div>
+  </div>
+  <h4>{{ company.name }}</h4>
+  <h4>{{ company.address }}</h4>
+  <h4>{{ company.email }}</h4>
+  <h4>{{ company.phone }}</h4>
+  <h4>{{ company.is_approved }}</h4>
+  <h4>{{ company.is_deactivated }}</h4>
+  <h4>{{ company.added_by }}</h4>
+  <h4>{{ company.approved_by }}</h4>
+  <h4>{{ company.deactivated_by }}</h4>
+  <h4>{{ company.deactivated_date }}</h4>
+  <h4>{{ company.approved_date }}</h4>
+
+  <div class="row">
+    {% for document in documents %}
+    <div class="col-sm-4 stretch-card grid-margin">
+      <a href="{% url 'document' document.id %}" class="stretched-link"></a>
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div class="card-title"> 
+              {{ document.category.name }} 
+              <small class="d-block text-muted">
+                {{ document.created }}
+              </small>
+            </div>
+          </div>
+        <div>
+        <object data="{{ document.file.url }}#toolbar=1&amp;navpanes=0&amp;scrollbar=1&amp;page=1&amp;view=FitH" type="application/pdf" width="100%" height="100%" scrolling="no" frameborder="0" style="overflow:hidden; width: 100%; height: 100%; -ms-overflow-style: none"></object>
+      </div>
+      <h5 class="font-weight-bold mb-0"> {{ document.status }}</h5>
+      <h5 class="font-weight-bold text-success mb-0"> {{ document.added_by.first_name }} {{ document.added_by.last_name }} </h5>
+      <span class="text-muted font-13">{{ document.comments|truncatechars:200 }}</span>
+    </div>
+  </div>
+</div>
+  {% endfor %}
+</div>
+
+{% endblock %}

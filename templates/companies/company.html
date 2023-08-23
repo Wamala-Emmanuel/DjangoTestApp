@@ -1,0 +1,162 @@
+{% extends "base.html" %} {% load static %} {%load crispy_forms_tags %} {% block content %}
+<div class="content-wrapper pb-0">
+  <div class="page-header flex-wrap">
+    <div class="header-left">
+      <a href="{% url 'update_company' company.id %}" class="btn btn-primary mb-2 mb-md-0 mr-2"> 
+        Update Company 
+      </a>
+      {% if company.is_approved %}
+      {% if request.user.profile.role.name == 'SuperUser' %}
+      <button class="btn btn-danger mb-2 mb-md-0" data-toggle="modal" data-target="#deactivateCompanyModal{{ company.id }}">Deactivate</button>
+      {% endif %}
+      <div class="modal fade" id="deactivateCompanyModal{{ company.id }}" tabindex="-1" role="dialog" aria-labelledby="activateCompanyModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Deactivate Company</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body ">
+              <p class="text-wrap">Are you sure you want to deactive {{ company.name }}?</p>
+            </div>
+            <div class="text-center mb-3">
+              <div class="spinner-grow text-primary d-none" id="linkTerminalSpinner"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <a href="{% url 'deactive_company' company.id %}" class="btn btn-danger">Deactivate Document</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      {% if request.user.profile.role.name == 'SuperUser' %}
+      <button class="btn btn-danger mb-2 mb-md-0" data-toggle="modal" data-target="#activateCompanyModal{{ company.id }}">Activate</button>
+      {% endif %}
+      <div class="modal fade" id="activateCompanyModal{{ company.id }}" tabindex="-1" role="dialog" aria-labelledby="activateCompanyModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Activate Company</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body ">
+              <p class="text-wrap">Are you sure you want to activate {{ company.name }} ?</p>
+            </div>
+            <div class="text-center mb-3">
+              <div class="spinner-grow text-primary d-none" id="linkTerminalSpinner"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <a href="{% url 'active_company' company.id %}" class="btn btn-danger">Activate Document</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="header-right d-flex flex-wrap mt-md-2 mt-lg-0">
+      <a href="{% url 'add_user' %}" type="button" class="btn btn-primary mt-2 mt-sm-0 btn-icon-text">
+        <i class="mdi mdi-plus-circle"></i> Add User 
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      {% if messages %}
+      <ul class="messages bg-success">
+        {% for message in messages %}
+        <div class="{{ message.tags }}">
+          <div class="alert alert-succes p-2">
+            <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
+              <i class="mdi mdi-close-box-outline"></i>
+            </button>
+            <span class="text-white"><b>{{ message|safe }}</b></span>
+          </div>
+        </div>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <div>
+            <div class="nav-profile-img text-center">
+              {% if company.logo %}
+              <img src="{{ company.logo.url }}" alt="image" width="70%" height="70%" /><br/>
+              {% else %}
+              <img src="{% static 'assets/images/logo.png' %}" alt="image" style="width: 70%; height: 70%;">
+              {% endif %}
+              {% if company.is_approved %}
+                <i class="mdi mdi-check-circle-outline text-success"></i>
+              {% else %}
+                <i class="mdi mdi-av-timer text-danger"></i>
+              {% endif %}
+              <span class="font-15 text-muted font-weight-bold">{{ company.name }}</span><br/>
+              <span class="font-12 text-muted">{{ company.address }}</span><br/>
+              <span class="font-12 text-muted">{{ company.email }}</span><br/>
+              <span class="font-12 text-muted">{{ company.phone }}</span><br/>
+              <span class="font-12 text-muted">{{ company.added_by }}</span><br/>
+            </div>
+            <hr class="hr" />
+            <span class="font-12 text-muted"><strong>Added By:</strong> {{ company.approved_by.first_name }} {{ company.approved_by.last_name }}</span><br/>
+            <span class="font-12 text-muted"><strong>Date Added:</strong> {{ company.created }}</span><br/>
+            <hr class="hr" />
+            <span class="font-12 text-muted"><strong>Approved By:</strong> {{ company.approved_by.first_name }} {{ company.approved_by.last_name }}</span><br/>
+            <span class="font-12 text-muted"><strong>Date Approved:</strong> {{ company.approved_date }}</span><br/>
+            <hr class="hr" />
+            <span class="font-12 text-muted"><strong>Deactivated By:</strong> {{ company.deactivated_by.first_name }} {{ company.deactivated_by.last_name }}</span><br/>
+            <span class="font-12 text-muted"><strong>Date Deactivated:</strong> {{ company.deactivated_date }}</span><br/>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xl-9">
+      <div class="card">
+        <div class="card-body">    
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>PDF</th>
+                  <th>Form Category</th>
+                  <th>Added By</th>
+                  <th>Stage</th>
+                  <th>Date Added</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for document in documents %}
+                <tr>
+                  <td>
+                    <i class="mdi mdi-file-pdf text-primary" style="font-size:40px;"></i>
+                  </td>
+                  <td>{{ document.category.name }}</td>
+                  <td>{{ document.added_by.first_name }} {{ document.added_by.last_name }}</td>
+                  <td>{{ document.stage }}</td>
+                  <td>{{ document.created.date }}</td>
+                  <td>
+                    <a href="{% url 'document' document.id %}" class="btn btn-sm btn-success">View</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>    
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,313 @@
+{% extends "base.html" %} {% load static %} {%load crispy_forms_tags %} {% block content %}
+<div class="content-wrapper pb-0">
+    <div class="page-header flex-wrap">
+        <div class="header-left">
+        </div>
+        <div>
+            {% if request.user.profile.role.name == 'A Signatory' or request.user.profile.role.name == 'B Signatory' %}
+            <a type="button" class="btn btn-primary mb-2 mb-md-0 mr-2" data-toggle="modal" data-target="#uploadSignedDocumentModal"> 
+                Upload Signed Document 
+            </a>
+            <div class="modal fade" id="uploadSignedDocumentModal" tabindex="-1" role="dialog" aria-labelledby="uploadSignedDocumentModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Upload Signed Document</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body ">
+                            <p class="text-wrap">Are you sure you want to upload this document?</p>
+                            <form class="mt-2" anctype="multipart/form-data" method="POST">
+                                {% csrf_token %}
+                                {{ signatory_form|crispy }}
+                                <input class="btn btn-primary btn-block btn-lg" type="submit" name="upload" value="Upload">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}
+            {% if request.user.profile.role.name == 'Company Originator' and document.stage == 'Originator' %}
+            <a href="{% url 'edit_document' document.id %}" class="btn btn-primary mb-2 mb-md-0 mr-2"> 
+                Edit 
+            </a>
+            {% endif %}
+            {% if request.user.profile.role.name == 'Company Originator' and document.stage == 'Approver' %}
+            <a href="{% url 'edit_document' document.id %}" class="btn btn-primary mb-2 mb-md-0 mr-2"> 
+                Edit 
+            </a>
+            {% endif %}
+            {% if request.user.profile.role.name == 'Company Approver' and document.stage == 'Approver' and document.status == 'Pending' %}
+            <a type="button" class="btn btn-warning mb-2 mb-md-0 mr-2" data-toggle="modal" data-target="#approveDocumentModal"> 
+                Approve
+            </a>
+            <div class="modal fade" id="approveDocumentModal" tabindex="-1" role="dialog" aria-labelledby="approveDocumentModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Approving Document</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body ">
+                            <p class="text-wrap">Are you sure you want to approve this document?</p>
+                        </div>
+                        <div class="text-center mb-3">
+                            <div class="spinner-grow text-primary d-none" id="linkTerminalSpinner"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <a href="{% url 'approve_document' document.id %}" class="btn btn-danger">Approve Document</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if request.user.profile.role.name != 'Company Originator' and document.stage != 'Originator' %}
+            <a type="button" class="btn btn-danger mb-2 mb-md-0 mr-2" data-toggle="modal" data-target="#rejectDocumentModal"> 
+                Reject 
+            </a>
+            <div class="modal fade" id="rejectDocumentModal" tabindex="-1" role="dialog" aria-labelledby="rejectDocumentModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Reject Document</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body ">
+                            <p class="text-wrap">Are you sure you want to reject this document?</p>
+                            <form class="mt-2" anctype="multipart/form-data" method="POST">
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                <input class="btn btn-primary btn-block btn-lg" type="submit" name="reject" value="Submit">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if request.user.profile.role.name == 'Bank Originator' and document.stage == 'Bank Originator' or document.stage == 'Completed' %}
+            <a type="button" class="btn btn-warning mb-2 mb-md-0 mr-2" data-toggle="modal" data-target="#approveDocumentModal"> 
+                Complete 
+            </a>
+            <a type="button" class="btn btn-danger mb-2 mb-md-0 mr-2" data-toggle="modal" data-target="#rejectDocumentModal"> 
+                Reject 
+            </a>
+            <a type="button" class="btn btn-warning mb-2 mb-md-0 mr-2" data-toggle="modal" data-target="#forwardToSignatoriesModal"> 
+                Forward to SB Signatories 
+            </a>
+            <div class="modal fade" id="forwardToSignatoriesModal" tabindex="-1" role="dialog" aria-labelledby="forwardToSignatoriesModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Forwarding to SB Signatories</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body ">
+                            <p class="text-wrap">Are you sure you want to forward to Signatories?</p>
+                            <p><strong>Select Signatories</strong></p>
+                            <form class="mt-2" anctype="multipart/form-data" method="POST">
+                                {% csrf_token %}
+                                {{ signatory_form|crispy }}
+                                <input class="btn btn-primary btn-block btn-lg" type="submit" name="reject" value="Submit">
+                            </form>
+                        </div>
+                        <!-- <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <a href="{% url 'forward_to_signatories' document.id %}" class="btn btn-danger">Forward to SB Signatories</a>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="{{ message.tags }}">
+                    <div class="alert alert-succes p-2">
+                        <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
+                    <i class="mdi mdi-close-box-outline"></i>
+                  </button>
+                        <span class="text-white"><b>{{ message|safe }}</b></span>
+                    </div>
+                </div>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title mb-2">{{ document.category.name }}
+                        <i class="mdi mdi-check-circle text-success"></i>
+                    </div>
+                    <div class="py-3 text-center">
+                        <div class="nav-profile-img">
+                            <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" />
+                        </div><br/>
+                        <span class="font-15 text-muted font-weight-bold">{{ document.added_by.profile.last_name }} {{ document.added_by.profile.first_name }}</span><br/>
+                        <span class="font-12 text-muted">{{ document.added_by.profile.username }}</span><br/>
+                        <span class="font-12 text-muted">{{ document.added_by.profile.phone }}</span><br/>
+                        <span class="font-12 text-muted">{{ document.added_by.profile.address }}</span>
+                        <h4 class="mt-1">
+                            <strong>@ {{ document.stage }}</strong>
+                        </h4>
+                        {% if document.rejected == True %}
+                        <h6 class="text-danger">Rejected</h6>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card mt-2">
+                <div class="card-body">
+                    <div class="card-title mb-3">Approvers</div>
+                    {% for area in document.approvers.all %}
+                        <p>{{ area.first_name }} {{ area.last_name }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% for history in rejection_history %}
+            <div class="card mt-2">
+                <div class="card-body">
+                    <div class="card-title mb-2">Rejection History</div>
+                    <div class="row mt-3">
+                        <div class="col-md-4 mr-0 pr-0">
+                            <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" style="width: 20%; height: 20%;" />
+                        </div>
+                        <div class="col-md-8 m-0 p-0 ">
+                            {% if request.user.profile.role.name == 'Company Originator' or request.user.profile.role.name == 'Company Approver' %}
+                            <small>{{ history.rejected_by.profile.role.name }}</small><br/>
+                            {% else %}
+                            <small>{{ history.rejected_by.profile.first_name }} {{ history.rejected_by.profile.last_name }}</small><br/>
+                            {% endif %}
+                            <span class="text-muted" style="font-size: 10px;">{{ history.created }}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex border-bottom py-3">
+                        <div class="">
+                            <small class="m-0 text-black"> {{ history.reason_for_rejection }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="row">
+                <div class="col-sm-12 col-xl-12 stretch-card grid-margin">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-title mb-2">Signatories</div>
+                            <div class="d-flex border-bottom border-top py-3">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" {% if document.a_signatory_signed_date %} checked {% endif %} disabled/></label>
+                                </div>
+                                <div class="ps-2">
+                                    <p class="m-0 text-black">{{ document.a_signatory.first_name }} {{ document.a_signatory.last_name }}</p>
+                                    <span class="font-12 text-muted">{{ document.a_signatory_signed_date }}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex border-bottom py-3">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" {% if document.b_signatory_signed_date %} checked {% endif %} disabled/></label>
+                                </div>
+                                <div class="ps-2">
+                                    <p class="m-0 text-black">{{ document.b_signatory.first_name }} {{ document.b_signatory.last_name }}</p>
+                                    <span class="font-12 text-muted">{{ document.b_signatory_signed_date }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-9">
+            <div class="card">
+                <div class="card-body">
+                    
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 p-0 m-0">
+                                <ul class="breadcrumb wizard">
+                                    {% if document.stage == 'Originator' %}
+                                        <li class="processing"><a href="javascript:void(0);">Originator</a></li>
+                                        <li><a href="javascript:void(0);">Approver</a></li>
+                                        <li><a href="javascript:void(0);">Personal Banker</a></li>
+                                        <li><a href="javascript:void(0);">Signatories</a></li>
+                                        <li><a href="javascript:void(0);">Completed</a></li>
+                                    {% endif %}
+                                    {% if document.stage == 'Approver' %}
+                                        <li class="completed"><a href="javascript:void(0);">Originator</a></li>
+                                        <li class="processing"><a href="javascript:void(0);">Approver</a></li>
+                                        <li><a href="javascript:void(0);">Personal Banker</a></li>
+                                        <li><a href="javascript:void(0);">Signatories</a></li>
+                                        <li><a href="javascript:void(0);">Completed</a></li>
+                                    {% endif %}
+                                    {% if document.stage == 'Personal Banker' %}
+                                        <li class="completed"><a href="javascript:void(0);">Originator</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Approver</a></li>
+                                        <li class="processing"><a href="javascript:void(0);">Personal Banker</a></li>
+                                        <li><a href="javascript:void(0);">Signatories</a></li>
+                                        <li><a href="javascript:void(0);">Completed</a></li>
+                                    {% endif %}
+                                    {% if document.stage == 'Signatories' %}
+                                        <li class="completed"><a href="javascript:void(0);">Originator</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Approver</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Personal Banker</a></li>
+                                        <li class="processing"><a href="javascript:void(0);">Signatories</a></li>
+                                        <li><a href="javascript:void(0);">Completed</a></li>
+                                    {% endif %}
+                                    {% if document.stage == 'A Signatory' %}
+                                        <li class="completed"><a href="javascript:void(0);">Originator</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Approver</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Personal Banker</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">B Signatories</a></li>
+                                        <li class="processing"><a href="javascript:void(0);">A Signatories</a></li>
+                                        <li><a href="javascript:void(0);">Completed</a></li>
+                                    {% endif %}
+                                    {% if document.stage == 'B Signatory' %}
+                                        <li class="completed"><a href="javascript:void(0);">Originator</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Approver</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Personal Banker</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">A Signatories</a></li>
+                                        <li class="processing"><a href="javascript:void(0);">B Signatories</a></li>
+                                        <li><a href="javascript:void(0);">Completed</a></li>
+                                    {% endif %}
+                                    {% if document.stage == 'Completed' %}
+                                        <li class="completed"><a href="javascript:void(0);">Originator</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Approver</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Personal Banker</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">A Signatories</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">B Signatories</a></li>
+                                        <li class="completed"><a href="javascript:void(0);">Completed</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% for document in uploaded_documents %}
+                        <object data="{{ document.file.url }}" type="text/html" width="100%" height="100%" style="height:calc(100vh - 70px)"></object>
+                    {% endfor %}
+                    <small><strong>Comments</strong></small><br/>
+                    <small>{{ document.comments }}</small><br/>
+                    <small class="pull-right mb-2">{{ document.created }}</small><br/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

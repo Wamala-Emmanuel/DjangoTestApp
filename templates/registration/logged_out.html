@@ -1,0 +1,21 @@
+{% extends "login_base.html" %} {% load static %} {%load crispy_forms_tags %} {% block content %}
+<div class="container-fluid page-body-wrapper full-page-wrapper">
+    <div class="content-wrapper d-flex align-items-center auth px-0" style="background-color: #0033A1;">
+        <div class="row w-100 mx-0">
+            <div class="col-lg-4 mx-auto">
+                <div class="auth-form-light text-left py-2 px-2 px-sm-5" style="background: #FFFFFF;">
+                    <div class="brand-logo text-center mb-3">
+                        <img src="{% static 'assets/images/logo.png' %}" alt="logo" style="width: 80%; height: 80%;">
+                    </div>
+                    <h4 class="text-center m-2">Online Document Tracker</h4>
+                    <h1 class="text-center m-2">Logged out</h1>
+                    <p class="text-center m-2">
+                        You have been successfully logged out. You can <a href="{% url 'login' %}">log-in again</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

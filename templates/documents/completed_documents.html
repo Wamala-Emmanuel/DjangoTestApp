@@ -1,0 +1,97 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="content-wrapper pb-0">
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      {% if messages %}
+      <ul class="messages bg-success">
+        {% for message in messages %}
+        <div class="{{ message.tags }}">
+          <div class="alert alert-succes p-2">
+            <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
+              <i class="mdi mdi-close-box-outline"></i>
+            </button>
+            <span class="text-white"><b>{{ message|safe }}</b></span>
+          </div>
+        </div>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <small class="card-title">Completed Documents</small>
+        </div>
+        <div class="col-md-8">
+          <form method="GET" action="">
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" name="q" placeholder="Search Form" />
+                <div class="input-group-append">
+                  <input class="btn btn-sm btn-primary" type="submit" value="Search Form" />
+                </div>
+              </div>
+            </div>
+          </form>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Form Category</th>
+            <th>Company</th>
+            <th>Added By</th>
+            <th>Stage</th>
+            <th>Status</th>
+            <th>Date Added</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for document in documents %}
+          <tr>
+            <td>
+              <img src="{% static 'assets/images/pdf.png' %}" alt="logo" style="width: 15%; height: 15%; border-radius: 0%;" class="mr-1">
+              {{ document.category.name }}
+            </td>
+            <td>{{ document.added_by.profile.company.name }}</td>
+            <td>{{ document.added_by.first_name }} {{ document.added_by.last_name }}</td>
+            <td>{{ document.stage }}</td>
+            <td>
+              {% if document.status == 'Approved' %}
+                <label class="badge badge-success">Approved</label>
+              {% else %}
+                <label class="badge badge-primary">Pending</label>
+              {% endif %}
+            </td>
+            <td>{{ document.created }}</td>
+            <td>
+              <a href="{% url 'document' document.id %}" class="btn btn-sm btn-success">View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if documents.has_other_pages %}
+      <div class="btn-group pull-right" role="group" aria-label="Item pagination">
+        {% if documents.has_previous %}
+        <a href="?page={{ documents.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a> {% endif %} {% for page_number in documents.paginator.page_range %} {% if documents.number == page_number %}
+        <button class="btn btn-outline-primary active">
+            <span>{{ page_number }} <span class="sr-only">(current)</span></span>
+        </button> {% else %}
+        <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+            {{ page_number }}
+        </a> {% endif %} {% endfor %} {% if documents.has_next %}
+        <a href="?page={{ documents.next_page_number }}" class="btn btn-outline-primary">&raquo;</a> {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>  
+</div>
+
+{% endblock %}

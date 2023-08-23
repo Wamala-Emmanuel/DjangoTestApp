@@ -1,0 +1,109 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="content-wrapper pb-0">
+    <div class="page-header flex-wrap">
+        <div class="header-left">
+            <p>Recently Uploaded Forms</p>
+        </div>
+        <!-- {% if request.user.profile.role.name == 'Personal Banker' %}
+        <div class="pull-right">
+            <a href="{% url 'add_document_category' %}" class="btn btn-primary mb-2 mb-md-0 mr-2">
+                Add Document Categories 
+            </a>
+        </div>
+        {% endif %} -->
+        <div class="pull-right">
+            {% if request.user.profile.role.name == 'SuperUser' and request.user.profile.role.name == 'Admin' %}
+            <a href="{% url 'add_document_category' %}" class="btn btn-primary mb-2 mb-md-0 mr-2">
+                Add Document Categories 
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            {% if messages %}
+            <ul class="messages bg-success">
+                {% for message in messages %}
+                <div class="{{ message.tags }}">
+                    <div class="alert alert-succes p-2">
+                        <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
+                        <i class="mdi mdi-close-box-outline"></i>
+                        </button>
+                        <span class="text-white"><b>{{ message|safe }}</b></span>
+                    </div>
+                </div>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    <div class="grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <!-- <th>PDF</th> -->
+                            <th>Category Name</th>
+                            <!-- <th>Added By</th> -->
+                            <th>Date Uploaded</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in categories %}
+                            <tr>
+                                <!-- <td class="py-1">
+                                    <img src="{% static 'assets/images/pdf.png' %}" alt="logo" style="width: 20%; height: 20%; border-radius: 0%;">
+                                </td> -->
+                                <td>
+                                    <img src="{% static 'assets/images/pdf.png' %}" alt="logo" style="width: 8%; height: 8%; border-radius: 0%;" class="mr-1">
+                                    {{ category.name }}
+                                </td>
+                                <!-- <td>
+                                    {{ category.added_by.profile.first_name }} {{ category.added_by.profile.last_name }}
+                                </td> -->
+                                <td>
+                                    {{ category.created }}
+                                </td>
+                                <td>
+                                    <a href="{{ category.file.url }}" class="btn btn-sm btn-success">
+                                        View
+                                    </a>
+                                    {% if request.user.profile.role.name == 'SuperUser' or request.user.profile.role.name == 'Admin' %}
+                                    <a href="{% url 'delete_category' category.id %}" class="btn btn-sm btn-danger">
+                                        Delete
+                                    </a>
+                                    <a href="{% url 'update_category' category.id %}" class="btn btn-sm btn-warning">
+                                        Update
+                                    </a>
+                                    {% endif %}
+                                    <a href="{{ category.file.url }}" download class="btn btn-sm btn-primary">
+                                        <i class="mdi mdi-download" style="font-size:13px;"></i> Download
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if categories.has_other_pages %}
+                    <div class="btn-group pull-right" role="group" aria-label="Item pagination">
+                      {% if categories.has_previous %}
+                      <a href="?page={{ categories.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a> {% endif %} {% for page_number in categories.paginator.page_range %} {% if categories.number == page_number %}
+                      <button class="btn btn-outline-primary active">
+                          <span>{{ page_number }} <span class="sr-only">(current)</span></span>
+                      </button> {% else %}
+                      <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+                          {{ page_number }}
+                      </a> {% endif %} {% endfor %} {% if categories.has_next %}
+                      <a href="?page={{ categories.next_page_number }}" class="btn btn-outline-primary">&raquo;</a> {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

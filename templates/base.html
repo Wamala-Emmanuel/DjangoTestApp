@@ -1,0 +1,269 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Online Document Tracker</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'assets/images/stanbic_logo.png' %}" />
+    <link rel="stylesheet" href="{% static 'assets/vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/flag-icon-css/css/flag-icon.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/css/vendor.bundle.base.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/jquery-bar-rating/css-stars.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/vendors/font-awesome/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/demo_2/style.css' %}" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+      .breadcrumb.wizard {
+          padding: 0px;
+        background: #D4D4D4;
+        list-style: none;
+        overflow: hidden;
+        font-size: 10px;
+      }
+      .breadcrumb.wizard>li+li:before {
+        padding: 0;
+      }
+      .breadcrumb.wizard li {
+        float: left;
+      }
+      .breadcrumb.wizard li.active a {
+        background: brown;                  
+        background: #ffc107 ;
+      }
+      .breadcrumb.wizard li.processing a {
+        background: brown;                   
+        background: #ffc107;
+      }
+      .breadcrumb.wizard li.completed a {
+        background: brown;                   
+        background: hsla(153, 57%, 51%, 1);
+      }
+      .breadcrumb.wizard li.active a:after {
+        border-left: 30px solid #ffc107 ;
+      }
+      .breadcrumb.wizard li.processing a:after {
+        border-left: 30px solid #ffc107
+      }
+      .breadcrumb.wizard li.completed a:after {
+        border-left: 30px solid hsla(153, 57%, 51%, 1);
+      }
+
+      .breadcrumb.wizard li a {
+        color: white;
+        text-decoration: none;
+        padding: 10px 0 10px 45px;
+        position: relative;
+        display: block;
+        float: left;
+      }
+      .breadcrumb.wizard li a:after {
+        content: " ";
+        display: block;
+        width: 0;
+        height: 0;
+        border-top: 50px solid transparent;          
+        border-bottom: 50px solid transparent;
+        border-left: 30px solid hsla(0, 0%, 83%, 1);
+        position: absolute;
+        top: 50%;
+        margin-top: -50px;
+        left: 100%;
+        z-index: 2;
+      }
+      .breadcrumb.wizard li a:before {
+        content: " ";
+        display: block;
+        width: 0;
+        height: 0;
+        border-top: 50px solid transparent;           
+        border-bottom: 50px solid transparent;
+        border-left: 30px solid white;
+        position: absolute;
+        top: 50%;
+        margin-top: -50px;
+        margin-left: 1px;
+        left: 100%;
+        z-index: 1;
+      }
+      .breadcrumb.wizard li:first-child a {
+        padding-left: 15px;
+      }
+      .breadcrumb.wizard li a:hover { background: #ffc107  ; }
+      .breadcrumb.wizard li a:hover:after { border-left-color: #ffc107   !important; }
+    </style>
+  </head>
+
+  <body>
+    <div class="container-scroller">
+      <div class="horizontal-menu">
+        <nav class="navbar top-navbar col-lg-12 col-12 p-0">
+          <div class="container">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+              <a class="navbar-brand brand-logo" href="index.html">
+                <img src="{% static 'assets/images/logo.png' %}" alt="logo" />
+                <span class="font-12 d-block font-weight-light">Upload Documents</span>
+              </a>
+              <a class="navbar-brand brand-logo-mini" href="index.html"><img src="../assets/images/logo-mini.svg" alt="logo" /></a>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+              
+              <ul class="navbar-nav navbar-nav-right">
+                <li class="nav-item nav-profile dropdown">
+                  {% if request.user.is_authenticated %}
+                  <a class="nav-link" id="profileDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+                    <div class="nav-profile-img">
+                      <img src="{% static 'assets/images/faces/face1.jpg' %}" alt="image" />
+                    </div>
+                    <div class="nav-profile-text">
+                      <p class="text-black font-weight-semibold m-0"> {{ request.user.first_name }} {{ request.user.last_name }} - {{ request.user.username }}</p>
+                      <span class="font-13 online-color">{{ request.user.profile.role.name }} <i class="mdi mdi-chevron-down"></i></span>
+                    </div>
+                  </a>
+                  <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
+                    <a class="dropdown-item" href="{% url 'logout' %}">
+                      <i class="mdi mdi-logout mr-2 text-primary"></i> Signout
+                    </a>
+                  </div>
+                  {% endif %}
+                </li>
+              </ul>
+              <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="horizontal-menu-toggle">
+                <span class="mdi mdi-menu"></span>
+              </button>
+            </div>
+          </div>
+        </nav>
+        <nav class="bottom-navbar">
+          <div class="container">
+            <ul class="nav page-navigation">
+              {% if request.user.profile.role.name == 'SuperUser' and request.user.profile.role.name == 'Admin' %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'users' %}">
+                  <i class="mdi mdi-contacts menu-icon"></i>
+                  <span class="menu-title">Users</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'companies' %}">
+                  <i class="mdi mdi-chart-bar menu-icon"></i>
+                  <span class="menu-title">Companies</span>
+                </a>
+              </li>
+              {% endif %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'documents' %}">
+                  <i class="mdi mdi-clipboard-text menu-icon"></i>
+                  <span class="menu-title">Documents</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'document_categories' %}">
+                  <i class="mdi mdi-clipboard-text menu-icon"></i>
+                  <span class="menu-title">Templates</span>
+                </a>
+              </li>
+
+              {% if request.user.profile.role.name == 'Admin' or request.user.profile.role.name == 'SuperUser' %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'audit_logs' %}">
+                  <i class="mdi mdi-table-large menu-icon"></i>
+                  <span class="menu-title">Audit Logs</span>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="container-fluid page-body-wrapper">
+        <div class="main-panel">
+            {% block content %} {% endblock %}
+            <footer class="footer">
+              <div class="container">
+                <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                  <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © Stanbic Bank - Uganda</span>
+                </div>
+              </div>
+            </footer>
+        </div>
+      </div>
+    </div>
+    <script>
+      // simple.js
+      (async () => {
+        const loadingTask = PDFJS.getDocument('/test.pdf');
+        const pdf = await loadingTask.promise;
+
+        // Load information from the first page.
+        const page = await pdf.getPage(1);
+
+        const scale = 1;
+        const viewport = page.getViewport(scale);
+
+        // Apply page dimensions to the `<canvas>` element.
+        const canvas = document.getElementById('pdf');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // Render the page into the `<canvas>` element.
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+        };
+        await page.render(renderContext);
+        console.log('Page rendered!');
+      })();
+    </script>
+    <script src="{% static 'assets/vendors/js/vendor.bundle.base.js' %}"></script>
+    <script src="{% static 'assets/vendors/jquery-bar-rating/jquery.barrating.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/chart.js' %}/Chart.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/flot/jquery.flot.js' %}"></script>
+    <script src="{% static 'assets/vendors/flot/jquery.flot.resize.js' %}"></script>
+    <script src="{% static 'assets/vendors/flot/jquery.flot.categories.js' %}"></script>
+    <script src="{% static 'assets/vendors/flot/jquery.flot.fillbetween.js' %}"></script>
+    <script src="{% static 'assets/vendors/flot/jquery.flot.stack.js' %}"></script>
+    <script src="{% static 'assets/js/off-canvas.js' %}"></script>
+    <script src="{% static 'assets/js/hoverable-collapse.js' %}"></script>
+    <script src="{% static 'assets/js/misc.js' %}"></script>
+    <script src="{% static 'assets/js/settings.js' %}"></script>
+    <script src="{% static 'assets/js/todolist.js' %}"></script>
+    <script src="{% static 'assets/js/dashboard.js' %}"></script>
+
+    <script>
+      var myState = {
+          pdf: null,
+          currentPage: 1,
+          zoom: 1
+      }
+
+      pdfjsLib.getDocument('otimtony.pdf').then((pdf) => {
+    
+          myState.pdf = pdf;
+          render();
+
+      });
+
+      function render() {
+        myState.pdf.getPage(myState.currentPage).then((page) => {
+          var canvas = document.getElementById("pdf_renderer");
+          var ctx = canvas.getContext('2d');
+
+          var viewport = page.getViewport(myState.zoom);
+
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+    
+          page.render({
+              canvasContext: ctx,
+              viewport: viewport
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
