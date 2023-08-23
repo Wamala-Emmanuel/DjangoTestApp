@@ -1,7 +1,7 @@
 FROM python:3.10-alpine AS builder
 WORKDIR /app
 COPY requirements.txt .
-RUN pip --version
+RUN pip install --upgrade pip setuptools
 RUN pip install -r requirements.txt
 COPY . .
 
