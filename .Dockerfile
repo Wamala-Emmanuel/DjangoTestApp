@@ -1,6 +1,6 @@
 FROM python:3.10-alpine AS builder
 WORKDIR /app
-RUN apt-get update && apt-get install -y build-essential
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
