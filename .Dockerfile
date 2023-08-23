@@ -2,23 +2,10 @@ FROM python:3.10-alpine AS builder
 WORKDIR /app
 COPY requirements.txt .
 RUN apk add --update --no-cache \
-    python3-dev \
-    libxml2-dev \
-    libxslt1-dev \
-    zlib1g-dev \
-    libsasl2-dev \
-    libldap2-dev \
-    build-essential \
-    libssl-dev \
+    tcl-dev \
+    tk-dev \
     libffi-dev \
-    libmysqlclient-dev \
-    libjpeg-dev \
-    libpq-dev \
-    libjpeg8-dev \
-    liblcms2-dev \
-    libblas-dev \
-    libatlas-base-dev \
-    python-ldap \
+    openssl-dev \
     tk
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
