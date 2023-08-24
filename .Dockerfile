@@ -2,7 +2,7 @@ FROM python:3.10-slim AS builder
 WORKDIR /app
 COPY requirements.txt .
 RUN apt-get update
-RUN apt-get install python3-dev
+RUN apt-get -y install tk
 RUN python -m pip install --upgrade pip setuptools wheel
 RUN python -m pip install cx_Oracle --upgrade
 RUN pip install Django==4.2 \
