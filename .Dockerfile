@@ -3,17 +3,6 @@ WORKDIR /app
 COPY requirements.txt .
 RUN apt-get update
 RUN apt-get -y install tk
-RUN python -m pip install --upgrade pip setuptools wheel
-RUN python -m pip install cx_Oracle --upgrade
-RUN pip install Django==4.2 \
-    django-environ \
-    django-crispy-forms \
-    celery \
-    django_celery_results \
-    Pillow \
-    unittest-xml-reporting \
-    python-ldap \
-    git+https://github.com/azure-samples/ms-identity-python-utilities@main
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
