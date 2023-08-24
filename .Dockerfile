@@ -1,7 +1,8 @@
 FROM python:3.10-slim AS builder
 WORKDIR /app
 COPY requirements.txt .
-RUN apt-get add --update --no-cache python3-dev libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev build-essential libssl-dev libffi-dev libmysqlclient-dev libjpeg-dev libpq-dev libjpeg8-dev liblcms2-dev libblas-dev libatlas-base-dev tk
+RUN apt-get update
+RUN apt-get install python3-dev libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev build-essential libssl-dev libffi-dev libmysqlclient-dev libjpeg-dev libpq-dev libjpeg8-dev liblcms2-dev libblas-dev libatlas-base-dev tk
 RUN python -m pip install --upgrade pip setuptools wheel
 RUN python -m pip install cx_Oracle --upgrade
 RUN pip install Django==4.2 \
