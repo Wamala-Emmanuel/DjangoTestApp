@@ -1,44 +1,76 @@
 trigger:
-- master
+- main
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  python_version: '3.10'
+  DOCKERHUB_ID: 'wamy1738'
+  IMAGE_NAME: 'odt-trial'
+  IMAGE_TAG: '1.0'
+  TRIVY_VERSION: 'v0.44.1'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python_version)'
-    architecture: 'x64'
+stages:
+  - stage: Build
+    displayName: Build, Test & Push to DockerHub
+    jobs:
+      - job: Build_Image
+        displayName: Run tests, build & push
+        steps:
+        - task: dependency-check-build-task@6
+          displayName: Run a SCA scan (OWASP Dependency Check)
+          continueOnError: true
+          inputs:
+            projectName: 'odt-sca'
+            scanPath: $(System.DefaultWorkingDirectory)
+            format: 'JUNIT'
+            failOnCVSS: 10 
+            
+        - task: PublishTestResults@2
+          displayName: Publish SCA scan report
+          continueOnError: true
+          inputs:
+            testResultsFormat: 'JUNIT'
+            testResultsFiles: '**/dependency-check-junit.xml'
+            testRunTitle: 'odt-sca'
+            searchFolder: $(Common.TestResultsDirectory)
+            publishRunAttachments: false
 
-- script: |
-    pip install Django==4.2
-    pip install django-environ
-    pip install virtualenv
-    source antenv/bin/activate
-    virtualenv antenv
-    python -m pip install --upgrade pip setuptools wheel
-    pip install --user django-crispy-forms
-    pip install celery
-    pip install django_celery_results
-    pip install Pillow
-    sudo apt-get install python3-dev libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev libldap2-dev build-essential libssl-dev libffi-dev libmysqlclient-dev libjpeg-dev libpq-dev libjpeg8-dev liblcms2-dev libblas-dev libatlas-base-dev
-    pip install git+https://github.com/azure-samples/ms-identity-python-utilities@main
-    sudo pip install python-ldap
-    apt-get install tk
-    python -m pip install cx_Oracle --upgrade
-    pip install unittest-xml-reporting
-    pip install -r requirements.txt
-  displayName: 'Install prerequisites'
-  
-- script: |
-    zip -r artifact.zip . -x ".*" -x "test*" -x "newenv/*" -x "azure-pipelines.yml"
-  displayName: Create a .ZIP file artifact
+        # - task: SonarQubePrepare@5
+        #   continueOnError: true
+        #   inputs:
+        #     SonarQube: 'YourSonarqubeServerEndpoint'
+        #     scannerMode: 'MSBuild'
+        #     projectKey: 'YourProjectKey'
 
-- task: PublishBuildArtifacts@1
-  displayName: Publish build artifact
-  inputs:
-    pathToPublish: './artifact.zip'
-    artifactName: artifact
+        # - task: SonarQubeAnalyze@5
+
+        # - task: SonarQubePublish@5
+        #   inputs:
+        #     pollingTimeoutSec: '300'
+
+        - task: Docker@2
+          displayName: Build docker image
+          inputs:
+            repository: $(DOCKERHUB_ID)/$(IMAGE_NAME)
+            command: 'build'
+            Dockerfile: '**/.Dockerfile'
+            tags: $(IMAGE_TAG)
+
+        - task: trivy@1
+          displayName: Run a SAST scan (Trivy)
+          inputs:
+            version: $(TRIVY_VERSION)
+            docker: false
+            image: $(DOCKERHUB_ID)/$(IMAGE_NAME):$(IMAGE_TAG)
+            severities: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+            options: --scanners vuln
+
+        - task: Docker@2
+          displayName: Push image to DockerHub
+          inputs:
+            containerRegistry: 'DockerHubConnection'
+            repository: $(DOCKERHUB_ID)/$(IMAGE_NAME)
+            command: 'push'
+            tags: $(IMAGE_TAG)
+
