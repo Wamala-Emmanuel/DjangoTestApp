@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.documents',
     'crispy_forms',
+    'crispy_bootstrap4',
     'apps.audit_logs',
     'django_celery_results',
 
