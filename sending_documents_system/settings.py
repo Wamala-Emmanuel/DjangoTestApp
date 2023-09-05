@@ -28,10 +28,10 @@ SECRET_KEY = 'django-insecure-63(8v1u=i-$%==isu$%00(@28zpfyi0_g21e%qyyw9$=bb#vo+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['odt.azurewebsites.net', 'localhost', '127.0.0.1', '169.254.130.4', 'odt-trial1.azurewebsites.net']
+ALLOWED_HOSTS = ['odt.azurewebsites.net', 'localhost', '127.0.0.1', '169.254.130.4', 'odt-uat.azurewebsites.net']
 
-CSRF_TRUSTED_ORIGINS = ['https://odt.azurewebsites.net', 'https://www.odt.azurewebsites.net', 'https://odt-trial1.azurewebsites.net']
-CORS_ORIGIN_WHITELIST = ['https://odt.azurewebsites.net', 'https://www.odt.azurewebsites.net', 'https://odt-trial1.azurewebsites.net']
+CSRF_TRUSTED_ORIGINS = ['https://odt.azurewebsites.net', 'https://odt-uat.azurewebsites.net']
+CORS_ORIGIN_WHITELIST = ['https://odt.azurewebsites.net', 'https://odt-uat.azurewebsites.net']
 
 # Application definition
 
