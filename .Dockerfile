@@ -1,7 +1,6 @@
-FROM python:3.10-slim AS builder
+FROM python:3.10-alpine AS builder
 WORKDIR /app
 COPY requirements.txt .
-RUN apk update && apk add tk
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8000
