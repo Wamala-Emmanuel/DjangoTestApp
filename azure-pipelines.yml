@@ -55,7 +55,9 @@ stages:
             repository: $(DOCKERHUB_ID)/$(IMAGE_NAME)
             command: 'build'
             Dockerfile: '**/.Dockerfile'
-            tags: $(IMAGE_TAG)
+            tags: |
+              $(IMAGE_TAG)
+              latest
 
         - task: trivy@1
           displayName: Run a SAST scan (Trivy)
@@ -72,5 +74,7 @@ stages:
             containerRegistry: 'DockerHubConnection'
             repository: $(DOCKERHUB_ID)/$(IMAGE_NAME)
             command: 'push'
-            tags: $(IMAGE_TAG)
+            tags: |
+              $(IMAGE_TAG)
+              latest
 
